@@ -1,3 +1,4 @@
+// const { createElement } = require("react");
 
 console.log('Quickslot starting')
 
@@ -22,7 +23,11 @@ const state = {
 const BOOKINGS_STORAGE_KEY = 'quickSlot_bookings'
 
 // DOM elements selection
+const statProvider = document.getElementById('statProviders')
+const statBookings = document.getElementById('statBookings')
+const statClock = document.getElementById('statClock')
 
+const providerInput = document.getElementById('providerInput')
 
 // function to readBookings
 function readBookings(){
@@ -32,6 +37,10 @@ function readBookings(){
 
     try {
         state.bookings = JSON.parse( localStorage.getItem(BOOKINGS_STORAGE_KEY) || '[]' ) 
+
+        // update statBookings UI
+        statBookings.innerText = `${state.bookings.length}`  
+
     } 
     catch (error) {
         state.bookings = []
@@ -45,11 +54,9 @@ function saveBookings(){
 }
 
 /*   Test
-
     state.bookings.push({test: 'hello'})
     console.log(state.bookings)
     saveBookings()
-
 */
 
 // function to fetch provider form api
@@ -84,9 +91,33 @@ async function fetchProviders(){
         console.error(error)
     }
     console.log('All providers: ', state.providers)
+
 }
 
 // function to render providers list
+function renderProviderSelect(){
+
+    providerInput.innerHTML = ""
+
+    state.providers.forEach(p => {
+
+        // console.log(p)
+        
+        const opt = document.createElement('option')
+        opt.value = p.id
+        opt.textContent = `${p.name} - ${p.specialty}`
+
+        providerInput.appendChild(opt)
+
+    });
+
+    // render provider stat
+    statProvider.innerText = `${state.providers.length}`
+
+}
+
+
+// fetch internet time using api and update the clock ui's
 
 
 
@@ -96,6 +127,8 @@ async function init(){
     readBookings()
     console.log('app Started, bookings: ', state.bookings)
     await fetchProviders()
+    renderProviderSelect()
+
 
 }
 

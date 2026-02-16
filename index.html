@@ -29,20 +29,20 @@
 
             <div class="d-flex flex-wrap gap-3" id="statsContainer" >
 
-                <div class="col-12 col-md-auto p-2 rounded-3 shadow text-center " style="background-color: rgb(254, 244, 206); min-width:140px; " id="statProviders">
+                <div class="col-12 col-md-auto p-2 rounded-3 shadow text-center " style="background-color: rgb(254, 244, 206); min-width:140px; " >
                     <p>PROVIDERS</p>
-                    <h5>-</h5>
+                    <h5 id="statProviders">-</h5>
                 </div>
                 
-                <div class="col-12 col-md-auto p-2 rounded-3 shadow text-center" style="background-color: rgb(254, 244, 206);min-width:140px;" id="statBookings" >
+                <div class="col-12 col-md-auto p-2 rounded-3 shadow text-center" style="background-color: rgb(254, 244, 206);min-width:140px;" >
                     <p>BOOKED</p>
-                    <h5 >0</h5>
+                    <h5 id="statBookings" >0</h5>
                 </div>
 
 
-                <div class="col-12 col-md-auto p-2 rounded-3 shadow text-center " style="background-color: rgb(254, 244, 206);min-width:140px;" id="statClock">
+                <div class="col-12 col-md-auto p-2 rounded-3 shadow text-center " style="background-color: rgb(254, 244, 206);min-width:140px;" >
                     <p>UTC CLOCK</p>
-                    <h5>00:00:00 PM</h5>
+                    <h5 id="statClock" >00:00:00 PM</h5>
                 </div>
             </div>
         </div>
@@ -70,7 +70,7 @@
             <div class="d-flex flex-column mt-3  mx-2 gap-1" >
                 <label for="providerInput" class=" fs-5 fw-semibold " >Provider</label>
                 
-                <select name="providerInput" id="providerInput" class=" p-2 ps-3 rounded-2" style="background-color: #fdf8e1; border:1px solid grey">
+                <select name="providerInput" id="providerInput" class=" p-1 ps-2 rounded-2" style="background-color: #fdf8e1; border:1px solid grey">
                     <option value="">Select Provider</option>
                 </select>
             </div>
