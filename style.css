@@ -1,0 +1,49 @@
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    /* background-color: rgb(249, 234, 177);; */
+}
+
+body{
+    background-color: rgb(251, 234, 167);;
+
+}
+
+#hero{
+    width: 80vw;
+    min-height: 500px;
+    /* background-color: rgb(250, 231, 155); */
+    /* border: 2px solid black; */
+    border-radius: 10px;
+    background-image: linear-gradient(to right bottom,rgb(250, 231, 155), rgb(251, 198, 124) );
+}
+
+
+#fetch_Slots_Btn:hover{
+    transform: scale(.95);
+}
+
+#clearAllBookings_Btn, #refreshSearchOrch_btn{
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    border: 1px solid grey;
+    z-index: 1;
+    padding: 0.3rem;
+    border-radius: 15px;
+    background-color: rgb(250, 231, 155);
+    transition: background-color 0.3s ease-in, transform 0.3s ease-in;
+}
+
+#refreshSearchOrch_btn{
+    width: 2.5rem;
+    height:2.5rem;
+    border-radius: 50%;
+}
+
+#clearAllBookings_Btn:hover, #refreshSearchOrch_btn:hover{
+    background-color: rgb(251, 198, 124);
+    transform: scale(.95);
+}
