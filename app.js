@@ -170,7 +170,7 @@ function buildSlots(){
 
             timeSlots.push({
                 label,
-                disabled: false
+                disabled: isSlotDisabled(state.target.date, label)
             })
         })
     }
@@ -180,7 +180,7 @@ function buildSlots(){
 
 
 // function to render time slots
-function renderSlots(SelectedProviderId, SelectedDate){
+function renderSlots(selectedProviderId, selectedDate){
     let timeSlots = buildSlots()
     // console.log(timeSlots)
 
@@ -199,28 +199,56 @@ function renderSlots(SelectedProviderId, SelectedDate){
         slotsGrid.appendChild(slotCard)
     })
 }
-// renderSlots()
+
+// function to disable slots -> past time and aleready booked slots
+function isSlotDisabled(date, slotLabel){
+
+    const slotDateTime = new Date(`${date}T${slotLabel}:00`)
+    // 1 - if the slot time is past current time
+    if( slotDateTime < state.nowUtc ){
+        return true
+    }
+
+    // 2 - if slot already booked
+    const isBooked = state.bookings.some((booking)=>
+        booking.providerId === state.target.providerId &&
+        booking.date === date &&
+        booking.slot === slotLabel
+    )
+
+    // if already booked -> return disable true
+    if(isBooked){
+        return true
+    }
+
+    // else return false
+    return false
+}
 
 // render slots() when fetch Slots BTN is clicked
 fetch_Slots_Btn.addEventListener('click', async()=>{
     
-    const SelectedProviderId = providerInput.value
-    const SelectedDate = dateInput.value
+    const selectedProviderId = providerInput.value
+    const selectedDate = dateInput.value
 
-    if(!SelectedProviderId || !SelectedDate){
+    if(!selectedProviderId || !selectedDate){
         alert('Please select a provider and date')
         return
     }
 
-    console.log('SelectedProviderId', SelectedProviderId)
-    console.log('SelectedDate', SelectedDate)
-
     // sync the clock again
     await fetchNowUtc()
-    renderSlots(SelectedProviderId, SelectedDate)
+
+    // update target state
+    state.target = {
+        providerId: selectedProviderId,
+        date: selectedDate 
+    }
+    renderSlots(selectedProviderId, selectedDate)
+
+    // console.log(state.target)
 
 })
-
 
 
 // main function -> init()
@@ -232,7 +260,6 @@ async function init(){
     await fetchProviders()
     renderProviderSelect()
     await fetchNowUtc()
-
 
 }
 
