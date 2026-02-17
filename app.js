@@ -106,7 +106,7 @@ async function fetchProviders(){
 // function to render providers list
 function renderProviderSelect(){
 
-    providerInput.innerHTML =`<option>Loading Roster...</option>`
+    providerInput.innerHTML =`<option>Select Provider</option>`
 
     state.providers.forEach(p => {
 
@@ -344,6 +344,8 @@ clearAllBookings_Btn.addEventListener('click', ()=>{
     // re-render bookings
     renderBookings()
     statBookings.innerText = 0
+
+    if(state.target) renderSlots()
 } )
 
 
