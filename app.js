@@ -6,7 +6,7 @@ console.log('Quickslot starting')
 const rosterUrl = "https://jsonplaceholder.typicode.com/users?_limit=10";
 // Fake API to fetch 10 random providers
 
-const clockUrl = "https://worldtimeapi.org/api/timezone/Asia/Kolkata";
+const clockUrl = "https://time.now/developer/api/timezone/Asia/Kolkata";
 // Real time API to sync with internet clock (IST)
 
 
@@ -26,6 +26,8 @@ const BOOKINGS_STORAGE_KEY = 'quickSlot_bookings'
 const statProvider = document.getElementById('statProviders')
 const statBookings = document.getElementById('statBookings')
 const statClock = document.getElementById('statClock')
+
+const syncTime = document.getElementById('syncTime')
 
 const providerInput = document.getElementById('providerInput')
 
@@ -97,7 +99,7 @@ async function fetchProviders(){
 // function to render providers list
 function renderProviderSelect(){
 
-    providerInput.innerHTML = ""
+    providerInput.innerHTML =`<option>Loading Roster...</option>`
 
     state.providers.forEach(p => {
 
@@ -118,7 +120,42 @@ function renderProviderSelect(){
 
 
 // fetch internet time using api and update the clock ui's
+async function fetchNowUtc(){
 
+    try {
+        const res = await fetch(clockUrl)
+
+        if(!res.ok){
+            throw new Error(`Failed to fetch. ${res.status}`)
+        }
+
+        const data = await res.json()
+        console.log(data)
+
+        // convert form string to js Datetime
+        state.nowUtc = new Date(data.utc_datetime)
+
+        // update statclock
+        statClock.textContent = state.nowUtc.toLocaleTimeString('en-IN',{
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+        })
+
+        // update lastSync UI
+        syncTime.textContent = new Date().toLocaleTimeString('en-IN', )
+        
+    } catch (error) {
+        console.error('Clock sync failed, falling back to client time', error)
+
+        // fall back to client time
+        state.nowUtc = new Date() // -> get local time
+        statClock.textContent = state.nowUtc.toLocaleTimeString('en-IN')
+        syncTime.textContent = `Fallback to client ${new Date().toLocaleTimeString('en-IN',)}`
+    }
+
+
+}
 
 
 
@@ -128,6 +165,7 @@ async function init(){
     console.log('app Started, bookings: ', state.bookings)
     await fetchProviders()
     renderProviderSelect()
+    await fetchNowUtc()
 
 
 }
