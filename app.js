@@ -222,6 +222,7 @@ function renderSlots(){
 
                 saveBookings()
                 renderSlots()
+                renderBookings()
 
                 // update statBookings UI
                 statBookings.innerText = state.bookings.length
@@ -293,42 +294,56 @@ fetch_Slots_Btn.addEventListener('click', async()=>{
 
 function renderBookings(){
 
-    // render only if bookings exist
-    if(state.bookings.length > 0){
+    bookingsGrid.innerHTML = ''
 
-        bookingsGrid.innerHTML = ''
+    // if bookings list in 0
+    if(state.bookings.length === 0){
+        bookingsGrid.innerHTML = '<div>No Bookings Yet!</div>'
+        return
+    }
 
-        state.bookings.forEach((booking)=>{
+    
+    state.bookings.forEach((booking, index)=>{
 
-            let bookingCard = document.createElement('div')
-            bookingCard.className = 'bookingCard shadow-lg '
+        let bookingCard = document.createElement('div')
+        bookingCard.className = 'bookingCard shadow-lg '
 
-            // extract provider name using provider id
-            let provider = state.providers.find(p=> p.id == booking.providerId)
-            console.log(provider)
+        // extract provider name using provider id
+        let provider = state.providers.find(p=> p.id == booking.providerId)
 
-            bookingCard.innerHTML = `
-                <div>${provider.name}</div>
-                <div>${booking.date}</div>
-                <div>${booking.slot}</div>
-                <button class='deleteBookingBtn'>Delete</button>
-            `
+        console.log(provider)
+
+        bookingCard.innerHTML = `
+            <div>${provider.name}</div>
+            <div>${booking.date}</div>
+            <div>${booking.slot}</div>
+            <button class='deleteBookingBtn'>Delete</button>
+        `
+        // adding individual booking delete functionality
+        const deleteBookingBtn = bookingCard.querySelector('.deleteBookingBtn')
+
+        deleteBookingBtn.addEventListener('click',()=>{
+            state.bookings.splice(index, 1)
+            saveBookings()
+            renderBookings()
+            renderSlots()
+            statBookings.innerText = state.bookings.length
+            })
 
             bookingsGrid.appendChild(bookingCard)
         })
-    }
+
 }
-
-// delete booking functionality
-
-
 
 // clear all bookings functionality
 clearAllBookings_Btn.addEventListener('click', ()=>{
-    localStorage.setItem(BOOKINGS_STORAGE_KEY, JSON.stringify([]) )
-    
+
+    // clear state.bookings and save in localStorage
+    state.bookings = []
+    saveBookings()
     // re-render bookings
     renderBookings()
+    statBookings.innerText = 0
 } )
 
 
