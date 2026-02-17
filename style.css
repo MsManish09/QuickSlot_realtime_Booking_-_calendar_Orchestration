@@ -21,7 +21,7 @@ body{
 }
 
 
-#fetch_Slots_Btn:hover{
+#fetch_Slots_Btn:hover, .deleteBookingBtn:hover{
     transform: scale(.95);
 }
 
@@ -50,7 +50,7 @@ body{
 
 
 
-.slotCard{
+.slotCard, .bookingCard{
     background-color: rgb(251, 198, 124);
     padding: 1rem;
     border: 1px solid grey;
@@ -59,6 +59,22 @@ body{
 
 }
 
+.bookingCard{
+    display: flex;
+    justify-content: space-evenly;
+    gap: 1rem;
+    padding: .5rem;
+    padding-left: 1rem;
+    font-weight: bold;
+}
+
 .slotCard:hover{
     transform: scale(.95);
+}
+
+
+.deleteBookingBtn{
+    padding: 5px;
+    background-color: rgb(255, 104, 104);
+    border-radius: 15px;
 }

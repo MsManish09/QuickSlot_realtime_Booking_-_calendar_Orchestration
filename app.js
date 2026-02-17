@@ -33,6 +33,9 @@ const providerInput = document.getElementById('providerInput')
 const slotsGrid = document.getElementById('slotsGrid')
 const fetch_Slots_Btn = document.getElementById('fetch_Slots_Btn')
 const dateInput = document.getElementById('dateInput')
+const slotsHeadline = document.getElementById('slotsHeadline')
+const bookingsGrid = document.getElementById('bookingsGrid')
+const clearAllBookings_Btn = document.getElementById('clearAllBookings_Btn')
 
 // function to readBookings
 function readBookings(){
@@ -51,6 +54,7 @@ function readBookings(){
         state.bookings = []
         console.log(error)
     }
+
 }
 
 // function to saveBookings
@@ -180,7 +184,7 @@ function buildSlots(){
 
 
 // function to render time slots
-function renderSlots(selectedProviderId, selectedDate){
+function renderSlots(){
     let timeSlots = buildSlots()
     // console.log(timeSlots)
 
@@ -197,6 +201,33 @@ function renderSlots(selectedProviderId, selectedDate){
         `
 
         slotsGrid.appendChild(slotCard)
+
+        // making slotCard bookable
+        
+        slotCard.addEventListener('click', ()=>{
+
+            // only if slot is not disabled
+            if(!slot.disabled){
+                console.log(state.target)
+
+                let booking = {
+                    providerId: state.target.providerId,
+                    date: state.target.date,
+                    slot: slot.label
+                }
+
+                state.bookings.push(booking)
+                console.log('Booking: ', booking)
+                console.log('Bookings State: ', state.bookings)
+
+                saveBookings()
+                renderSlots()
+
+                // update statBookings UI
+                statBookings.innerText = state.bookings.length
+            }
+            
+        })
     })
 }
 
@@ -244,11 +275,61 @@ fetch_Slots_Btn.addEventListener('click', async()=>{
         providerId: selectedProviderId,
         date: selectedDate 
     }
-    renderSlots(selectedProviderId, selectedDate)
+    renderSlots()
 
+    // update slots heading
+    slotsHeadline.innerText = ''
+
+    // extract provider name using provider id
+    let provider = state.providers.find(p=> p.id == selectedProviderId)
+
+    slotsHeadline.innerText = `${provider.name} + ${selectedDate}`
+ 
     // console.log(state.target)
 
 })
+
+// update my bookings UI (bookingsGrid) -> on Dom LOad and booking updates
+
+function renderBookings(){
+
+    // render only if bookings exist
+    if(state.bookings.length > 0){
+
+        bookingsGrid.innerHTML = ''
+
+        state.bookings.forEach((booking)=>{
+
+            let bookingCard = document.createElement('div')
+            bookingCard.className = 'bookingCard shadow-lg '
+
+            // extract provider name using provider id
+            let provider = state.providers.find(p=> p.id == booking.providerId)
+            console.log(provider)
+
+            bookingCard.innerHTML = `
+                <div>${provider.name}</div>
+                <div>${booking.date}</div>
+                <div>${booking.slot}</div>
+                <button class='deleteBookingBtn'>Delete</button>
+            `
+
+            bookingsGrid.appendChild(bookingCard)
+        })
+    }
+}
+
+// delete booking functionality
+
+
+
+// clear all bookings functionality
+clearAllBookings_Btn.addEventListener('click', ()=>{
+    localStorage.setItem(BOOKINGS_STORAGE_KEY, JSON.stringify([]) )
+    
+    // re-render bookings
+    renderBookings()
+} )
 
 
 // main function -> init()
@@ -259,6 +340,7 @@ async function init(){
 
     await fetchProviders()
     renderProviderSelect()
+    renderBookings()
     await fetchNowUtc()
 
 }
