@@ -7,7 +7,7 @@
 }
 
 body{
-    background-color: rgb(251, 234, 167);;
+    background-color: rgb(253, 249, 233);;
 
 }
 
@@ -45,5 +45,20 @@ body{
 
 #clearAllBookings_Btn:hover, #refreshSearchOrch_btn:hover{
     background-color: rgb(251, 198, 124);
+    transform: scale(.95);
+}
+
+
+
+.slotCard{
+    background-color: rgb(251, 198, 124);
+    padding: 1rem;
+    border: 1px solid grey;
+    border-radius: 10px;
+    cursor: pointer;
+
+}
+
+.slotCard:hover{
     transform: scale(.95);
 }

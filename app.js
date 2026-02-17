@@ -1,4 +1,3 @@
-// const { createElement } = require("react");
 
 console.log('Quickslot starting')
 
@@ -16,7 +15,8 @@ const state = {
     providers: [],
     nowUtc : null,
     bookings : [],
-    pendingSlot: null
+    pendingSlot: null,
+    target : null
 }
 
 // bookings LocalStorage key
@@ -30,6 +30,9 @@ const statClock = document.getElementById('statClock')
 const syncTime = document.getElementById('syncTime')
 
 const providerInput = document.getElementById('providerInput')
+const slotsGrid = document.getElementById('slotsGrid')
+const fetch_Slots_Btn = document.getElementById('fetch_Slots_Btn')
+const dateInput = document.getElementById('dateInput')
 
 // function to readBookings
 function readBookings(){
@@ -130,7 +133,7 @@ async function fetchNowUtc(){
         }
 
         const data = await res.json()
-        console.log(data)
+        // console.log(data)
 
         // convert form string to js Datetime
         state.nowUtc = new Date(data.utc_datetime)
@@ -153,16 +156,79 @@ async function fetchNowUtc(){
         statClock.textContent = state.nowUtc.toLocaleTimeString('en-IN')
         syncTime.textContent = `Fallback to client ${new Date().toLocaleTimeString('en-IN',)}`
     }
-
-
 }
+
+// slot generator function
+function buildSlots(){
+
+    const timeSlots = []
+
+    for( let i = 9; i <= 17; i++ ){
+        ['00', '30'].forEach((item)=>{
+            // format to always have 2 digits
+            let label = `${String(i).padStart(2, "0")}:${item}`
+
+            timeSlots.push({
+                label,
+                disabled: false
+            })
+        })
+    }
+
+    return timeSlots
+}
+
+
+// function to render time slots
+function renderSlots(SelectedProviderId, SelectedDate){
+    let timeSlots = buildSlots()
+    // console.log(timeSlots)
+
+    // empty slotsGrid element before rendering slots
+    slotsGrid.innerHTML = ""
+
+    timeSlots.forEach((slot)=>{
+        let slotCard = document.createElement('div')
+        slotCard.className = `slotCard h-100 ${slot.disabled ? "disabled": ""} `
+
+        slotCard.innerHTML = `
+            <div class='fw-semibold' >${slot.label}</div>
+            <div class='small text-secondary' >${slot.disabled ? 'Unavailable': 'Tap to book'}</div>
+        `
+
+        slotsGrid.appendChild(slotCard)
+    })
+}
+// renderSlots()
+
+// render slots() when fetch Slots BTN is clicked
+fetch_Slots_Btn.addEventListener('click', async()=>{
+    
+    const SelectedProviderId = providerInput.value
+    const SelectedDate = dateInput.value
+
+    if(!SelectedProviderId || !SelectedDate){
+        alert('Please select a provider and date')
+        return
+    }
+
+    console.log('SelectedProviderId', SelectedProviderId)
+    console.log('SelectedDate', SelectedDate)
+
+    // sync the clock again
+    await fetchNowUtc()
+    renderSlots(SelectedProviderId, SelectedDate)
+
+})
 
 
 
 // main function -> init()
 async function init(){
+
     readBookings()
     console.log('app Started, bookings: ', state.bookings)
+
     await fetchProviders()
     renderProviderSelect()
     await fetchNowUtc()
