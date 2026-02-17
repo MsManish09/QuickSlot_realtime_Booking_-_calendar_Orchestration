@@ -37,6 +37,33 @@ const slotsHeadline = document.getElementById('slotsHeadline')
 const bookingsGrid = document.getElementById('bookingsGrid')
 const clearAllBookings_Btn = document.getElementById('clearAllBookings_Btn')
 
+// modal elements
+const modal = new bootstrap.Modal(
+    document.getElementById('confirmBookingModal')
+)
+const confirmBookingBtn = document.getElementById('confirmBookingBtn')
+const toastElement = document.getElementById("appToast")
+const toastMessage = document.getElementById("toastMessage")
+const toast = new bootstrap.Toast(toastElement)
+
+// toast functionality
+function showToast(message, type='primary'){
+
+    // remove previous color classes
+    toastElement.classList.remove(
+        "text-bg-primary",
+        "text-bg-success",
+        "text-bg-danger",
+        "text-bg-warning"
+    )
+
+    // add new color class
+    toastElement.classList.add(`text-bg-${type}`)
+
+    toastMessage.textContent = message
+    toast.show()
+}
+
 // function to readBookings
 function readBookings(){
 
@@ -210,27 +237,48 @@ function renderSlots(){
             if(!slot.disabled){
                 console.log(state.target)
 
-                let booking = {
+                state.pendingSlot = {
                     providerId: state.target.providerId,
+                    providerName: state.target.providerName,
                     date: state.target.date,
                     slot: slot.label
                 }
 
-                state.bookings.push(booking)
-                console.log('Booking: ', booking)
-                console.log('Bookings State: ', state.bookings)
-
-                saveBookings()
-                renderSlots()
-                renderBookings()
-
-                // update statBookings UI
-                statBookings.innerText = state.bookings.length
+                // open modal
+                modal.show()
+                
+                const confirmText = document.getElementById("confirmBookingText")
+                confirmText.textContent = `Schedule the booking for ${slot.label} on ${state.target.date}?`
+                
             }
             
         })
     })
 }
+
+// modal booking confirmation functionaliy
+confirmBookingBtn.addEventListener('click', ()=>{
+    // if there is no pending slot
+    if(!state.pendingSlot) return
+
+    //else -> update bookings state and save, persist -> re-render
+    state.bookings.push(state.pendingSlot)
+    saveBookings()
+    renderSlots()
+    renderBookings()
+
+    //update statBookings UI
+    statBookings.innerText = state.bookings.length
+
+    // empty the pending slot state
+    state.pendingSlot = null
+
+    // hide modal
+    modal.hide()
+
+    showToast('Booking confirmed', 'success')
+
+})
 
 // function to disable slots -> past time and aleready booked slots
 function isSlotDisabled(date, slotLabel){
@@ -323,15 +371,22 @@ function renderBookings(){
         const deleteBookingBtn = bookingCard.querySelector('.deleteBookingBtn')
 
         deleteBookingBtn.addEventListener('click',()=>{
-            state.bookings.splice(index, 1)
-            saveBookings()
-            renderBookings()
-            renderSlots()
-            statBookings.innerText = state.bookings.length
-            })
+                state.bookings.splice(index, 1)
+                saveBookings()
+                renderBookings()
 
-            bookingsGrid.appendChild(bookingCard)
-        })
+                // generate slots if target state is prsent
+                if(state.target) renderSlots()
+
+                statBookings.innerText = state.bookings.length
+
+                // show delete toast
+                showToast('Booking deleted', 'danger')
+            }
+        )
+
+        bookingsGrid.appendChild(bookingCard)
+    })
 
 }
 
@@ -345,8 +400,12 @@ clearAllBookings_Btn.addEventListener('click', ()=>{
     renderBookings()
     statBookings.innerText = 0
 
+    // show cleared all toast
+    showToast('All bookings cleared', 'warning')
+
     if(state.target) renderSlots()
 } )
+
 
 
 // main function -> init()
