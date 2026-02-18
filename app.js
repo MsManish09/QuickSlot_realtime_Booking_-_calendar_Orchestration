@@ -19,6 +19,10 @@ const state = {
     target : null
 }
 
+// UI state to render bookings based on filter
+let selectedBookingFilter = 'all'
+
+
 // bookings LocalStorage key
 const BOOKINGS_STORAGE_KEY = 'quickSlot_bookings'
 
@@ -36,6 +40,8 @@ const dateInput = document.getElementById('dateInput')
 const slotsHeadline = document.getElementById('slotsHeadline')
 const bookingsGrid = document.getElementById('bookingsGrid')
 const clearAllBookings_Btn = document.getElementById('clearAllBookings_Btn')
+
+const bookingFilter = document.getElementById('bookingFilter')
 
 // modal elements
 const modal = new bootstrap.Modal(
@@ -135,6 +141,8 @@ function renderProviderSelect(){
 
     providerInput.innerHTML =`<option>Select Provider</option>`
 
+    bookingFilter.innerHTML = `<option value='all' >All Provider</option>`
+
     state.providers.forEach(p => {
 
         // console.log(p)
@@ -144,6 +152,13 @@ function renderProviderSelect(){
         opt.textContent = `${p.name} - ${p.specialty}`
 
         providerInput.appendChild(opt)
+
+        // also populate bookings filter iwth provider
+        const fitlerOpt = document.createElement('option')
+        fitlerOpt.value = p.id
+        fitlerOpt.textContent = `${p.name}`
+
+        bookingFilter.appendChild(fitlerOpt)
 
     });
 
@@ -332,7 +347,7 @@ fetch_Slots_Btn.addEventListener('click', async()=>{
     // extract provider name using provider id
     let provider = state.providers.find(p=> p.id == selectedProviderId)
 
-    slotsHeadline.innerText = `${provider.name} + ${selectedDate}`
+    slotsHeadline.innerText = `${provider.name} - ${new Date(selectedDate).toLocaleDateString('en-IN')}`
  
     // console.log(state.target)
 
@@ -342,6 +357,8 @@ fetch_Slots_Btn.addEventListener('click', async()=>{
 
 function renderBookings(){
 
+    let bookingsToRender = []
+
     bookingsGrid.innerHTML = ''
 
     // if bookings list in 0
@@ -350,8 +367,18 @@ function renderBookings(){
         return
     }
 
+    // if booking filter value is all
+    if(selectedBookingFilter == 'all'){
+        bookingsToRender = state.bookings
+    }
+
+    // when filter value changes
+    else{
+        bookingsToRender = state.bookings.filter(p => p.providerId == selectedBookingFilter )
+    }
+
     
-    state.bookings.forEach((booking, index)=>{
+    bookingsToRender.forEach((booking, index)=>{
 
         let bookingCard = document.createElement('div')
         bookingCard.className = 'bookingCard shadow-lg '
@@ -371,7 +398,14 @@ function renderBookings(){
         const deleteBookingBtn = bookingCard.querySelector('.deleteBookingBtn')
 
         deleteBookingBtn.addEventListener('click',()=>{
-                state.bookings.splice(index, 1)
+                // if all the id, date, slot matches , return false, filter out of the state.booking -> deletes the booking
+                state.bookings = state.bookings.filter(b=> 
+                    !(
+                        b.providerId === booking.providerId &&
+                        b.date === booking.date &&
+                        b.slot === booking.slot
+                    )
+                )
                 saveBookings()
                 renderBookings()
 
@@ -405,6 +439,12 @@ clearAllBookings_Btn.addEventListener('click', ()=>{
 
     if(state.target) renderSlots()
 } )
+
+// filter bookings by provider functionality
+bookingFilter.addEventListener('change', ()=>{
+    selectedBookingFilter = bookingFilter.value
+    renderBookings()
+})
 
 
 

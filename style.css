@@ -78,3 +78,7 @@ body{
     background-color: rgb(255, 104, 104);
     border-radius: 15px;
 }
+
+#bookingFilter{
+    background-color: rgb(252, 250, 240);
+}
