@@ -42,6 +42,7 @@ const bookingsGrid = document.getElementById('bookingsGrid')
 const clearAllBookings_Btn = document.getElementById('clearAllBookings_Btn')
 
 const bookingFilter = document.getElementById('bookingFilter')
+const refreshSearchOrch_btn = document.getElementById('refreshSearchOrch_btn')
 
 // modal elements
 const modal = new bootstrap.Modal(
@@ -444,6 +445,23 @@ clearAllBookings_Btn.addEventListener('click', ()=>{
 bookingFilter.addEventListener('change', ()=>{
     selectedBookingFilter = bookingFilter.value
     renderBookings()
+})
+
+
+// refresh btn functionality
+refreshSearchOrch_btn.addEventListener('click', async ()=>{
+
+    // toast a warning if provider and date is not selected
+    if(!state.target){
+        showToast('Select provide and date first', 'warning')
+        return
+    }
+
+    // else
+    await fetchNowUtc() // update clock
+    renderSlots() // re-render slots
+
+    showToast('Availability refreshed', 'primary')
 })
 
 
